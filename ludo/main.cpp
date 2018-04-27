@@ -5,19 +5,18 @@
 #include "ludo_player.h"
 #include "ludo_player_random.h"
 #include "positions_and_dice.h"
-
-#include "my_shit.h"
+// Custom files.
+#include "ludo_player_custom.h"
 
 Q_DECLARE_METATYPE( positions_and_dice )
 
 int main(int argc, char *argv[]){
-    my_shit::print();
     QApplication a(argc, argv);
     qRegisterMetaType<positions_and_dice>();
 
     //instanciate the players here
-    ludo_custom_player p1; //green (p1), yellow (p2)
-    ludo_player_random p2, p3, p4; //blue (p3), red (p4)
+    ludo_player_custom p1; //green (p1)
+    ludo_player_random p2, p3, p4; // yellow (p2), blue (p3), red (p4)
     //XXXXXX your player e.g., p4 xxxxxxx//
 
     game g;
