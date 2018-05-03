@@ -6,22 +6,26 @@ ludo_player_custom::ludo_player_custom(){
 
 int ludo_player_custom::make_decision(){
     if(dice_roll == 6){
+        // Move the token from home in case any of them is there
         for(int i = 0; i < 4; ++i){
             if(pos_start_of_turn[i]<0){
                 return i;
             }
         }
+        // Move the token with the higher index
         for(int i = 0; i < 4; ++i){
             if(pos_start_of_turn[i]>=0 && pos_start_of_turn[i] != 99){
                 return i;
             }
         }
     } else {
+        // Move the token with the higher index
         for(int i = 0; i < 4; ++i){
             if(pos_start_of_turn[i]>=0 && pos_start_of_turn[i] != 99){
                 return i;
             }
         }
+        // All tokens at home
         for(int i = 0; i < 4; ++i){ //maybe they are all locked in
             if(pos_start_of_turn[i]<0){
                 return i;

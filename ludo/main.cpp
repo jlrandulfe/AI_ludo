@@ -18,9 +18,9 @@ int main(int argc, char *argv[]){
     ludo_player_random p2, p3, p4;
 
     game g;
-    g.setGameDelay(000); //if you want to see the game, set a delay
+    g.setGameDelay(1000); //if you want to see the game, set a delay
 
-    /* Add a GUI <-- remove the '/' to uncomment block
+    // Add a GUI <-- remove the '/' to uncomment block
     Dialog w;
     QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
     QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]){
 
     // Successes counter.
     int won_games = 0;
-    int total_games = 1000;
+    int total_games = 10000;
     // Main loop.
     for(int i = 0; i < total_games; ++i){
         g.start();
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
         }
         g.reset();
     }
-    
+
     double hit_rate = 100 * won_games / total_games;
     std::cout << "P1 won: " << hit_rate << "% out of " << total_games << 
             " games" << std::endl;
