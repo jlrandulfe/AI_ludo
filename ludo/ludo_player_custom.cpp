@@ -1,7 +1,13 @@
 #include "ludo_player_custom.h"
+#include "q_learning.h"
 #include <random>
 
-ludo_player_custom::ludo_player_custom(){   
+ludo_player_custom::ludo_player_custom(){
+    // Set the size and initial values of the R and Q matrices.
+    // Resize sets the values automatically to 0.
+    this->R.resize(this->n_states, std::vector<int>(this->n_actions));
+    this->Q.resize(this->n_states, std::vector<int>(this->n_actions));
+    q_learnning::construct_R_matrix(this->R);
 }
 
 int ludo_player_custom::make_decision(){

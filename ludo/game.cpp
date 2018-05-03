@@ -4,7 +4,7 @@
 game::game():
     game_complete(false),
     turn_complete(true),
-    game_delay(1000),
+    game_delay(0),
     relative(),
     dice_result(1),
     rd(),

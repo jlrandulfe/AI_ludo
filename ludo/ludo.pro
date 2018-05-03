@@ -24,7 +24,8 @@ HEADERS  += dialog.h \
     ludo_player.h \
     positions_and_dice.h \
     ludo_player_random.h \
-    ludo_player_custom.h
+    ludo_player_custom.h \
+    q_learning.h
 
 FORMS    += dialog.ui
 
