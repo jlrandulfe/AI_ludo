@@ -1,10 +1,10 @@
 #include "game.h"
 #define DEBUG 0
 
-game::game():
+Game::Game():
     game_complete(false),
     turn_complete(true),
-    game_delay(0),
+    game_delay(1000),
     relative(),
     dice_result(1),
     rd(),
@@ -15,7 +15,7 @@ game::game():
 {
 }
 
-void game::reset(){
+void Game::reset(){
     game_complete = false;
     turn_complete = true;
     for(auto &i : player_positions){ //without & we're changing the copy made in auto rather than the player_position
@@ -25,11 +25,11 @@ void game::reset(){
 }
 
 
-int game::rel_to_fixed(int relative_piece_index){
+int Game::rel_to_fixed(int relative_piece_index){
     return relative_piece_index + color * 4;
 }
 
-int game::isStar(int index){
+int Game::isStar(int index){
     if(index == 5  ||
        index == 18 ||
        index == 31 ||
@@ -44,7 +44,7 @@ int game::isStar(int index){
     return 0;
 }
 
-int game::isOccupied(int index){ //returns number of people of another color
+int Game::isOccupied(int index){ //returns number of people of another color
     int number_of_people = 0;
 
     if(index != 99){
@@ -59,7 +59,7 @@ int game::isOccupied(int index){ //returns number of people of another color
     return number_of_people;
 }
 
-bool game::isGlobe(int index){
+bool Game::isGlobe(int index){
     if(index < 52){     //check only the indexes on the board, not in the home streak
         if(index % 13 == 0 || (index - 8) % 13 == 0 || isOccupied(index) > 1){  //if more people of the same team stand on the same spot it counts as globe
             return true;
@@ -68,7 +68,7 @@ bool game::isGlobe(int index){
     return false;
 }
 
-void game::send_them_home(int index){
+void Game::send_them_home(int index){
     for(size_t i = 0; i < player_positions.size(); ++i){
         if(i < static_cast<size_t>(color)*4 || i >= static_cast<size_t>(color)*4 + 4){        //this way we don't skip one player position
             if(player_positions[i] == index){
@@ -78,14 +78,14 @@ void game::send_them_home(int index){
     }
 }
 
-void game::move_start(int fixed_piece){
+void Game::move_start(int fixed_piece){
     if(dice_result == 6 && player_positions[fixed_piece] < 0){
         player_positions[fixed_piece] = color*13; //move me to start
         send_them_home(color*13); //send pieces home if they are on our start
     }
 }
 
-int game::next_turn(unsigned int delay = 0){
+int Game::next_turn(unsigned int delay = 0){
     if(game_complete){
         return 0;
     }
@@ -127,7 +127,7 @@ int game::next_turn(unsigned int delay = 0){
     return 0;
 }
 
-void game::movePiece(int relative_piece){
+void Game::movePiece(int relative_piece){
     int fixed_piece = rel_to_fixed(relative_piece);     //index of the piece in player_positions
     int modifier = color * 13;
     int relative_pos = player_positions[fixed_piece];
@@ -181,7 +181,7 @@ void game::movePiece(int relative_piece){
                 target_pos = new_pos - 52;  //this is the global position wrap around at the green entry point
             }
         }
-        //check for game stuff
+        //check for Game stuff
 
         if(isOccupied(target_pos)){
             if(isGlobe(target_pos)){
@@ -212,7 +212,7 @@ void game::movePiece(int relative_piece){
     emit update_graphics(player_positions);
 }
 
-std::vector<int> game::relativePosition(){
+std::vector<int> Game::relativePosition(){
     std::vector<int> relative_positions;
     int modifier = color * 13;
 
@@ -240,7 +240,7 @@ std::vector<int> game::relativePosition(){
     return std::move(relative_positions);
 }
 
-void game::turnComplete(bool win){
+void Game::turnComplete(bool win){
     game_complete = win;
     turn_complete = true;
     if(game_complete){
@@ -249,7 +249,7 @@ void game::turnComplete(bool win){
     }
 }
 
-void game::run() {
+void Game::run() {
     if(DEBUG) std::cout << "color:     relative pos => fixed\n";
     while(!game_complete){
         if(turn_complete){

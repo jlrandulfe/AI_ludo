@@ -13,14 +13,16 @@ int main(int argc, char *argv[]){
     QApplication a(argc, argv);
     qRegisterMetaType<positions_and_dice>();
 
+    Game g;
+
     //instanciate the players here
-    ludo_player_custom p1;
+    ludo_player_custom p1(&g);
+    // p1.player_positions = &g.player_positions;
     ludo_player_random p2, p3, p4;
 
-    game g;
-    g.setGameDelay(0); //if you want to see the game, set a delay
+    g.setGameDelay(1000); //if you want to see the game, set a delay
 
-    /*/ Add a GUI <-- remove the '/' to uncomment block
+    // Add a GUI <-- remove the '/' to uncomment block
     Dialog w;
     QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
     QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));

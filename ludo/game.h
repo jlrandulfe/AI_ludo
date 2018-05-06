@@ -12,7 +12,7 @@
 
 // static int global_color = 5;
 
-class game : public QThread
+class Game : public QThread
 {
     Q_OBJECT
 private:
@@ -44,7 +44,7 @@ public:
         dice_result = dis(gen);
     }
     int getDiceRoll() {return dice_result; }
-    game();
+    Game();
     void setGameDelay(unsigned int mili_seconds){ game_delay = mili_seconds; }
     void reset();
 signals:

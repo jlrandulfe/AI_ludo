@@ -3,11 +3,18 @@
 #include <QObject>
 #include <iostream>
 #include <vector>
+#include <random>
 #include "positions_and_dice.h"
+#include "game.h"
+
+
+
 
 class ludo_player_custom : public QObject {
     Q_OBJECT
 private:
+    Game* game;
+    int state [4];
     int n_states = 5;
     int n_actions = 8;
     std::vector< std::vector<int> > R;
@@ -16,8 +23,9 @@ private:
     std::vector<int> pos_end_of_turn;
     int dice_roll;
     int make_decision();
+    void get_state();
 public:
-    ludo_player_custom();
+    ludo_player_custom(Game* game);
 signals:
     void select_piece(int);
     void turn_complete(bool);
