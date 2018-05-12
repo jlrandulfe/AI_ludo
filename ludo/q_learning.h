@@ -33,4 +33,19 @@ namespace q_learning {
         matrix_file.close();
         return;
     }
+
+    void update_Q_matrix(std::vector< std::vector<int> >& Q,
+                         std::vector< std::vector<int> >& R,
+                         double discount_factor, int state,
+                         int next_state, int action) {
+        // Get the reward for the selected state and action.
+        int reward = R[state][action];
+        // Look for the maximum q-value in the future state.
+        std::vector<int> Q_future = Q[next_state];
+        auto it = max_element(std::begin(Q_future), std::end(Q_future));
+        int max_q = *it;
+        // Bellman equation.
+        int new_q = reward + discount_factor*max_q;
+        Q[state][action] = new_q;
+    }
 }
