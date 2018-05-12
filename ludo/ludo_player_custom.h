@@ -7,9 +7,6 @@
 #include "positions_and_dice.h"
 #include "game.h"
 
-
-
-
 class ludo_player_custom : public QObject {
     Q_OBJECT
 private:
@@ -19,7 +16,6 @@ private:
     int n_states = 5;
     int n_actions = 8;
     std::vector< std::vector<int> > R;
-    std::vector< std::vector<int> > Q;
     double discount_factor;
     bool learning;
     // Ludo game attributes
@@ -31,6 +27,7 @@ private:
     int make_decision();
     void get_state();
 public:
+    std::vector< std::vector<int> > Q;
     ludo_player_custom(Game* game);
 signals:
     void select_piece(int);

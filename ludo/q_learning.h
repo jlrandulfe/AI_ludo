@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#ifndef QLEARNING_H
+#define QLEARNING_H
 
 namespace q_learning {
     void construct_R_matrix(std::vector< std::vector<int> >& R) {
@@ -38,6 +40,7 @@ namespace q_learning {
                          std::vector< std::vector<int> >& R,
                          double discount_factor, int state,
                          int next_state, int action) {
+        bool debug = false;
         // Get the reward for the selected state and action.
         int reward = R[state][action];
         // Look for the maximum q-value in the future state.
@@ -47,5 +50,18 @@ namespace q_learning {
         // Bellman equation.
         int new_q = reward + discount_factor*max_q;
         Q[state][action] = new_q;
+
+        //DEBUG
+        if (debug) {
+            std::cout << "Reward: " << reward << "\n";
+            std::cout << "Future state q-values:\n";
+            for (int i=0; i<Q_future.size(); ++i) {
+                std::cout << Q_future[i] << " ";
+            }
+            std::cout << "\nmax-q: " << max_q << "\n";
+            std::cout << "new-q: " << new_q << "\n";
+        }
     }
 }
+
+#endif

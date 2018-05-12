@@ -4,14 +4,14 @@
 Game::Game():
     game_complete(false),
     turn_complete(true),
-    game_delay(1000),
+    game_delay(10),
     relative(),
     dice_result(1),
     rd(),
     gen(rd()),
     color(3),
-    //player_positions({-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1})
-    player_positions({0,-1,-1,-1,13,-1,-1,-1,26,-1,-1,-1,39,-1,-1,-1})
+    player_positions({-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1})
+    // player_positions({0,-1,-1,-1,13,-1,-1,-1,26,-1,-1,-1,39,-1,-1,-1})
 {
 }
 

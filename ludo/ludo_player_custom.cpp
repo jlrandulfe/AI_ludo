@@ -1,6 +1,7 @@
 #include "ludo_player_custom.h"
-#include "q_learning.h"
 #include "game_functions.h"
+#include "q_learning.h"
+
 
 ludo_player_custom::ludo_player_custom(Game* my_game) {
     // Set the size and initial values of the R and Q matrices.
@@ -16,6 +17,7 @@ ludo_player_custom::ludo_player_custom(Game* my_game) {
 }
 
 int ludo_player_custom::make_decision(){
+    bool debug = false;
     // If all tokens are blocked, don't run the algorithm
     if (std::all_of(std::begin(this->pos_start_of_turn),
                     std::end(this->pos_start_of_turn),
@@ -42,12 +44,46 @@ int ludo_player_custom::make_decision(){
             movable_pieces.push_back(i);
         }
     }
+
+    // DEBUG:
+    if (debug) {
+        std::cout << "Dice roll: " << dice_roll << "\n";
+        std::cout << "Tokens positions:\n";
+        std::cout << "Positions:\n";
+        for (int i=0; i<4; ++i) {
+            std::cout << this->pos_start_of_turn[i] << " ";
+        }
+        std::cout << "\nStates:\n";
+        for (int i=0; i<4; ++i) {
+            std::cout << this->state[i] << " ";
+        }
+        std::cout << "\nPossible actions:\n";
+        for (int i=0; i<4; ++i) {
+            std::cout << possible_actions[i] << " ";
+        }
+        std::cout << "\nPossible states:\n";
+        for (int i=0; i<4; ++i) {
+            std::cout << possible_states[i] << " ";
+        }
+        std::cout << "\n";
+    }
+
     // Select a random piece for moving.
     int select;
     if (movable_pieces.size() > 0) {
+        if (debug) {
+            std::cout << "\nMovable tokens:\n";
+                for (int i=0; i<movable_pieces.size(); ++i) {
+                    std::cout << movable_pieces[i] << " ";
+                }
+        }
         std::uniform_int_distribution<> piece(0, movable_pieces.size()-1);
         int idx = piece(gen);
         select = movable_pieces[idx];
+        //DEBUG
+        if (debug) {
+            std::cout << "\nChosen token: " << idx << "\n";
+        }
         q_learning::update_Q_matrix(this->Q, this->R, this->discount_factor,
                                     this->state[idx], possible_states[idx],
                                     possible_actions[idx]);
@@ -55,7 +91,13 @@ int ludo_player_custom::make_decision(){
     else {
         select = 0;
     }
-    getchar();
+
+    if (debug){
+        std::cout << "\n";
+        getchar();
+    }
+
+    movable_pieces.clear();
     return select;
 }
 
