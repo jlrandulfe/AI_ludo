@@ -11,40 +11,66 @@ ludo_player_custom::ludo_player_custom(Game* my_game) {
     this->Q.resize(this->n_states, std::vector<int>(this->n_actions));
     q_learning::construct_R_matrix(this->R);
     q_learning::get_Q_matrix(this->Q, "../resources/q-matrix");
-    // q_learning::set_Q_matrix(this->Q, "../resources/q-matrix-temp");
+    this->discount_factor = 0.5;
+    this->learning = true;
 }
 
 int ludo_player_custom::make_decision(){
     // If all tokens are blocked, don't run the algorithm
-    if (std::all_of(std::begin(pos_start_of_turn), std::end(pos_start_of_turn),
-            [](int pos){ return pos < 0; })) {
+    if (std::all_of(std::begin(this->pos_start_of_turn),
+                    std::end(this->pos_start_of_turn),
+                    [](int pos){ return pos < 0; })) {
         return 0;
     }
+    // Update the state of the player.
+    this->get_state();
     int possible_actions [4];
     int possible_states [4];
+    // Get the next state, action, and reward for moving each token.
     for (int i=0; i<4; ++i) {
-        printf("Got here\n");
         std::pair<int, int> next_move =
-                game_functions::get_next_state_and_action(pos_start_of_turn[i],
-                        dice_roll, this->game->player_positions);
+                game_functions::get_next_state_and_action(
+                        this->pos_start_of_turn[i], this->dice_roll,
+                        this->game->player_positions);
         possible_states[i] = next_move.first;
         possible_actions[i] = next_move.second;
     }
-    return 0;
+    // Make a list with the pieces that can be moved.
+    std::vector<int> movable_pieces;
+    for (int i=0; i<4; ++i) {
+        if (possible_actions[i] != -1) {
+            movable_pieces.push_back(i);
+        }
+    }
+    // Select a random piece for moving.
+    int select;
+    if (movable_pieces.size() > 0) {
+        std::uniform_int_distribution<> piece(0, movable_pieces.size()-1);
+        int idx = piece(gen);
+        select = movable_pieces[idx];
+        q_learning::update_Q_matrix(this->Q, this->R, this->discount_factor,
+                                    this->state[idx], possible_states[idx],
+                                    possible_actions[idx]);
+    }
+    else {
+        select = 0;
+    }
+    getchar();
+    return select;
 }
 
-void ludo_player_custom::start_turn(positions_and_dice relative){
-    pos_start_of_turn = relative.pos;
-    dice_roll = relative.dice;
+void ludo_player_custom::start_turn(positions_and_dice relative) {
+    this->pos_start_of_turn = relative.pos;
+    this->dice_roll = relative.dice;
     int decision = make_decision();
     emit select_piece(decision);
 }
 
-void ludo_player_custom::post_game_analysis(std::vector<int> relative_pos){
-    pos_end_of_turn = relative_pos;
+void ludo_player_custom::post_game_analysis(std::vector<int> relative_pos) {
+    this->pos_end_of_turn = relative_pos;
     bool game_complete = true;
     for(int i = 0; i < 4; ++i){
-        if(pos_end_of_turn[i] < 99){
+        if(this->pos_end_of_turn[i] < 99){
             game_complete = false;
         }
     }
@@ -60,23 +86,25 @@ void ludo_player_custom::get_state() {
     // 3: At home position
     // 4: At goal
     for (int i=0; i<4; ++i) {
-        if (pos_start_of_turn[i]<0) {
+        if (this->pos_start_of_turn[i]<0) {
             this->state[i] = 0;
         }
-        else if (game_functions::isGlobe(pos_start_of_turn[i]) == true) {
+        else if (game_functions::isGlobe(this->pos_start_of_turn[i]) == true) {
             this->state[i] = 2;
         }
-        else if (pos_start_of_turn[i] > 51) {
+        else if (this->pos_start_of_turn[i] > 51) {
             this->state[i] = 3;
         }
-        else if (pos_start_of_turn[i]==99 || pos_start_of_turn[i] == 56) {
+        else if (this->pos_start_of_turn[i]==99 ||
+                 this->pos_start_of_turn[i] == 56) {
             this->state[i] = 4;
         }
         else {
             this->state[i] = 1;
             for (int j=0; j<4; ++j) {
                 if (j!=i) {
-                    if (pos_start_of_turn[i] == pos_start_of_turn[j]) {
+                    if (this->pos_start_of_turn[i] ==
+                            this->pos_start_of_turn[j]) {
                         this->state[i] = 2;
                     }
                 }
