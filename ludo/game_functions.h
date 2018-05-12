@@ -28,9 +28,32 @@ namespace game_functions {
         int next_state;
         int action;
         int next_position = init_position + dice_roll;
-        // DEBUG
-        std::cout << "P2: " << positions[4] << ", " << positions[5] 
-                << ", " << positions[6] << ", " << positions[7] << "\n";
+
+        // Check for friends at the destination square.
+        bool ally = false;
+        for (int i=0; i<4; ++i) {
+            if (positions[i] == next_position) {
+                ally = true;
+                break;
+            }
+        }
+        // Check for enemies or a blockade at the destination square.
+        bool enemy = false;
+        bool blocking = false;
+        for (int i=4; i<16; ++i) {
+            if (positions[i] == next_position) {
+                enemy = true;
+                // Check if there is a blocking
+                for (int j=4; j<16; ++j) {
+                    if (positions[j]==next_position && i!=j) {
+                        blocking = true;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
         // Token at start home
         if (init_position == -1) {
             if (dice_roll == 6) {
@@ -42,35 +65,70 @@ namespace game_functions {
                 next_state = 0;
             }
         }
+
         // Token to star
         else if (isStar(next_position)) {
-            action = 3;
-            next_state = 1;
+            // Last start i.e. directly to goal
+            if (next_position == 50) {
+                action = 7;
+                next_state = 4;
+            }
+            else{
+                action = 3;
+                next_state = 1;
+            }
+            // TODO: Consider situation when:
+            // enemy or blocking at the jumped position
         }
+
         // Token to globe
         else if (isGlobe(next_position)) {
+            if (enemy == true) {
+                action = 4;
+                next_state = 0;
+            }
+            else {
+                action = 2;
+                next_state = 2;
+            }
+        }
+
+        // Token to a friend occupied square
+        else if (ally == true) {
             action = 2;
             next_state = 2;
         }
-        // Token to a friend occupied square
 
         // Token to an enemy occupied square
+        else if (enemy == true) {
+            if (blocking == true) {
+                action = 4;
+                next_state = 0;
+            }
+            else {
+                action = 5;
+                next_state = 1;
+            }
+        }
 
-        // Token to home row
+        // Token to home stretch
         else if (next_position > 50) {
             action = 6;
             next_state = 3;
         }
+
         // Token to goal
-        else if (next_position == 56 || next_position == 50) {
+        else if (next_position == 56) {
             action = 7;
             next_state = 4;
         }
+
         // Token to a normal position
         else {
             action = 1;
             next_state = 1;
         }
+
         return std::make_pair(next_state, action);
     }
 }
