@@ -16,13 +16,13 @@ int main(int argc, char *argv[]){
     Game g;
 
     //instanciate the players here
-    ludo_player_custom p1(&g);
+    ludo_player_custom p1;
     // p1.player_positions = &g.player_positions;
     ludo_player_random p2, p3, p4;
 
-    g.setGameDelay(1000); //if you want to see the game, set a delay
+    g.setGameDelay(0); //if you want to see the game, set a delay
 
-    // Add a GUI <-- remove the '/' to uncomment block
+    /*/ Add a GUI <-- remove the '/' to uncomment block
     Dialog w;
     QObject::connect(&g,SIGNAL(update_graphics(std::vector<int>)),&w,SLOT(update_graphics(std::vector<int>)));
     QObject::connect(&g,SIGNAL(set_color(int)),                   &w,SLOT(get_color(int)));
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
 
     // Successes counter.
     int won_games = 0;
-    int total_games = 1;
+    int total_games = 100;
     // Main loop.
     for(int i = 0; i < total_games; ++i){
         g.start();

@@ -3,11 +3,9 @@
 #include "q_learning.h"
 
 
-ludo_player_custom::ludo_player_custom(Game* my_game) {
+ludo_player_custom::ludo_player_custom() {
     // Set the size and initial values of the R and Q matrices.
     // Resize sets the values automatically to 0.
-    this->game = my_game;
-
     this->R.resize(this->n_states, std::vector<int>(this->n_actions));
     this->Q.resize(this->n_states, std::vector<int>(this->n_actions));
     q_learning::construct_R_matrix(this->R);
@@ -33,7 +31,7 @@ int ludo_player_custom::make_decision(){
         std::pair<int, int> next_move =
                 game_functions::get_next_state_and_action(
                         this->pos_start_of_turn[i], this->dice_roll,
-                        this->game->player_positions);
+                        this->pos_start_of_turn);
         possible_states[i] = next_move.first;
         possible_actions[i] = next_move.second;
     }
@@ -73,7 +71,7 @@ int ludo_player_custom::make_decision(){
     if (movable_pieces.size() > 0) {
         if (debug) {
             std::cout << "\nMovable tokens:\n";
-                for (int i=0; i<movable_pieces.size(); ++i) {
+                for (auto i=0; i<movable_pieces.size(); ++i) {
                     std::cout << movable_pieces[i] << " ";
                 }
         }
@@ -82,19 +80,19 @@ int ludo_player_custom::make_decision(){
         select = movable_pieces[idx];
         //DEBUG
         if (debug) {
-            std::cout << "\nChosen token: " << idx << "\n";
+            std::cout << "\nChosen token: " << select << "\n";
         }
         q_learning::update_Q_matrix(this->Q, this->R, this->discount_factor,
                                     this->state[idx], possible_states[idx],
                                     possible_actions[idx]);
     }
     else {
-        select = 0;
+        select = -1;
     }
 
     if (debug){
         std::cout << "\n";
-        getchar();
+        // getchar();
     }
 
     movable_pieces.clear();
@@ -131,15 +129,16 @@ void ludo_player_custom::get_state() {
         if (this->pos_start_of_turn[i]<0) {
             this->state[i] = 0;
         }
-        else if (game_functions::isGlobe(this->pos_start_of_turn[i]) == true) {
-            this->state[i] = 2;
-        }
-        else if (this->pos_start_of_turn[i] > 51) {
+        else if (this->pos_start_of_turn[i] > 51 &&
+                 this->pos_start_of_turn[i] < 56) {
             this->state[i] = 3;
         }
-        else if (this->pos_start_of_turn[i]==99 ||
+        else if (this->pos_start_of_turn[i] == 99 ||
                  this->pos_start_of_turn[i] == 56) {
             this->state[i] = 4;
+        }
+        else if (game_functions::isGlobe(this->pos_start_of_turn[i]) == true) {
+            this->state[i] = 2;
         }
         else {
             this->state[i] = 1;

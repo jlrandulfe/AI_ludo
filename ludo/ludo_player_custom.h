@@ -10,7 +10,6 @@
 class ludo_player_custom : public QObject {
     Q_OBJECT
 private:
-    Game* game;
     // Q-learning attributes
     int state [4];
     int n_states = 5;
@@ -28,7 +27,7 @@ private:
     void get_state();
 public:
     std::vector< std::vector<int> > Q;
-    ludo_player_custom(Game* game);
+    ludo_player_custom();
 signals:
     void select_piece(int);
     void turn_complete(bool);
