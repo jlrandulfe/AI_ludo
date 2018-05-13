@@ -9,7 +9,7 @@ ludo_player_custom::ludo_player_custom() {
     this->R.resize(this->n_states, std::vector<int>(this->n_actions));
     this->Q.resize(this->n_states, std::vector<int>(this->n_actions));
     q_learning::construct_R_matrix(this->R);
-    q_learning::get_Q_matrix(this->Q, "../resources/q-matrix");
+    q_learning::get_Q_matrix(this->Q, "../resources/q-matrix-temp2");
     this->discount_factor = 0.5;
     this->learning = true;
 }
@@ -37,9 +37,11 @@ int ludo_player_custom::make_decision(){
     }
     // Make a list with the pieces that can be moved.
     std::vector<int> movable_pieces;
-    for (int i=0; i<4; ++i) {
-        if (possible_actions[i] != -1) {
-            movable_pieces.push_back(i);
+    if (learning == true) {
+        for (int i=0; i<4; ++i) {
+            if (possible_actions[i] != -1) {
+                movable_pieces.push_back(i);
+            }
         }
     }
 
@@ -47,7 +49,6 @@ int ludo_player_custom::make_decision(){
     if (debug) {
         std::cout << "Dice roll: " << dice_roll << "\n";
         std::cout << "Tokens positions:\n";
-        std::cout << "Positions:\n";
         for (int i=0; i<4; ++i) {
             std::cout << this->pos_start_of_turn[i] << " ";
         }
@@ -66,35 +67,52 @@ int ludo_player_custom::make_decision(){
         std::cout << "\n";
     }
 
-    // Select a random piece for moving.
     int select;
-    if (movable_pieces.size() > 0) {
-        if (debug) {
-            std::cout << "\nMovable tokens:\n";
+    // Select a random piece for moving.
+    if (learning == true) {
+        if (movable_pieces.size() > 0) {
+            if (debug) {
+                std::cout << "\nMovable tokens:\n";
                 for (auto i=0; i<movable_pieces.size(); ++i) {
                     std::cout << movable_pieces[i] << " ";
                 }
+            }
+            std::uniform_int_distribution<> piece(0, movable_pieces.size()-1);
+            int idx = piece(gen);
+            select = movable_pieces[idx];
+            q_learning::update_Q_matrix(this->Q, this->R, this->discount_factor,
+                                        this->state[idx], possible_states[idx],
+                                        possible_actions[idx]);
         }
-        std::uniform_int_distribution<> piece(0, movable_pieces.size()-1);
-        int idx = piece(gen);
-        select = movable_pieces[idx];
-        //DEBUG
-        if (debug) {
-            std::cout << "\nChosen token: " << select << "\n";
+        else {
+            select = -1;
         }
-        q_learning::update_Q_matrix(this->Q, this->R, this->discount_factor,
-                                    this->state[idx], possible_states[idx],
-                                    possible_actions[idx]);
     }
-    else {
-        select = -1;
+
+    // If not learning, choose the biggest Q-value
+    if (learning == false) {
+        std::vector<int> q_values {0, 0, 0, 0};
+        for (auto i=0; i<4; ++i) {
+            q_values[i] = this->Q[this->state[i]][possible_actions[i]];
+        }
+        // Look for the maximum q-value
+        std::vector<int>::iterator max_it = std::max_element(q_values.begin(),
+                                                             q_values.end());
+        select = std::distance(q_values.begin(), max_it);
+        // If the q-value is not positive, return a -1.
+        if (q_values[select] <= 0) {
+            select = -1;
+        }
     }
 
     if (debug){
         std::cout << "\n";
         // getchar();
     }
-
+    //DEBUG
+    if (debug) {
+        std::cout << "\nChosen token: " << select << "\n";
+    }
     movable_pieces.clear();
     return select;
 }
