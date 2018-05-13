@@ -1,4 +1,6 @@
 #include "dialog.h"
+#include <iostream>
+#include <fstream>
 #include <QApplication>
 #include "game.h"
 #include <vector>
@@ -8,6 +10,18 @@
 #include "positions_and_dice.h"
 
 Q_DECLARE_METATYPE( positions_and_dice )
+
+void set_Q_matrix(std::vector< std::vector<int> >& Q, std::string fname) {
+    std::ofstream matrix_file(fname);
+    for(int row=0; row<5; ++row){
+        for(int col=0; col<8; ++col){
+            matrix_file << Q[row][col] << " ";
+        }
+        matrix_file << "\n";
+    }
+    matrix_file.close();
+    return;
+}
 
 int main(int argc, char *argv[]){
     QApplication a(argc, argv);
@@ -68,6 +82,8 @@ int main(int argc, char *argv[]){
         std::cout << i << std::endl;
         g.reset();
     }
+
+    set_Q_matrix(p1.Q, "../resources/q-matrix-temp");
 
     double hit_rate = 100 * won_games / total_games;
     std::cout << "P1 won: " << hit_rate << "% out of " << total_games << 
