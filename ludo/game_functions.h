@@ -87,6 +87,12 @@ namespace game_functions {
             // enemy or blocking at the jumped position
         }
 
+        // Token to home stretch
+        else if (next_position > 50 && next_position !=56) {
+            action = 6;
+            next_state = 3;
+        }
+
         // Token to globe
         else if (isGlobe(next_position)) {
             if (enemy == true) {
@@ -97,6 +103,12 @@ namespace game_functions {
                 action = 2;
                 next_state = 2;
             }
+        }
+
+        // Token to goal
+        else if (next_position == 56) {
+            action = 7;
+            next_state = 4;
         }
 
         // Token to a friend occupied square
@@ -115,18 +127,6 @@ namespace game_functions {
                 action = 5;
                 next_state = 1;
             }
-        }
-
-        // Token to home stretch
-        else if (next_position > 50) {
-            action = 6;
-            next_state = 3;
-        }
-
-        // Token to goal
-        else if (next_position == 56) {
-            action = 7;
-            next_state = 4;
         }
 
         // Token to a normal position
