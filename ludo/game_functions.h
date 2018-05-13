@@ -66,6 +66,12 @@ namespace game_functions {
             }
         }
 
+        // Token already at goal.
+        else if (init_position == 99) {
+            action = -1;
+            next_state = 4;
+        }
+
         // Token to star
         else if (isStar(next_position)) {
             // Last start i.e. directly to goal
