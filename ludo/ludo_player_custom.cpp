@@ -9,8 +9,9 @@ ludo_player_custom::ludo_player_custom() {
     this->R.resize(this->n_states, std::vector<int>(this->n_actions));
     this->Q.resize(this->n_states, std::vector<int>(this->n_actions));
     q_learning::construct_R_matrix(this->R);
-    q_learning::get_Q_matrix(this->Q, "../resources/q-matrix-temp2");
+    q_learning::get_Q_matrix(this->Q, "../resources/q-matrix");
     this->discount_factor = 0.5;
+    this->learning_rate = 0.3;
     this->learning = true;
 }
 
@@ -82,7 +83,8 @@ int ludo_player_custom::make_decision(){
             select = movable_pieces[idx];
             q_learning::update_Q_matrix(this->Q, this->R, this->discount_factor,
                                         this->state[idx], possible_states[idx],
-                                        possible_actions[idx]);
+                                        possible_actions[idx],
+                                        this->learning_rate);
         }
         else {
             select = -1;

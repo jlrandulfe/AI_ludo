@@ -16,7 +16,6 @@ private:
     int n_actions = 8;
     std::vector< std::vector<int> > R;
     double discount_factor;
-    bool learning;
     // Ludo game attributes
     std::vector<int> pos_start_of_turn;
     std::vector<int> pos_end_of_turn;
@@ -26,6 +25,8 @@ private:
     int make_decision();
     void get_state();
 public:
+    double learning_rate;
+    bool learning;
     std::vector< std::vector<int> > Q;
     ludo_player_custom();
 signals:

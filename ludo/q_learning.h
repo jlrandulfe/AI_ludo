@@ -39,7 +39,7 @@ namespace q_learning {
     void update_Q_matrix(std::vector< std::vector<int> >& Q,
                          std::vector< std::vector<int> >& R,
                          double discount_factor, int state,
-                         int next_state, int action) {
+                         int next_state, int action, double alpha) {
         bool debug = false;
         // Get the reward for the selected state and action.
         int reward = R[state][action];
@@ -47,8 +47,9 @@ namespace q_learning {
         std::vector<int> Q_future = Q[next_state];
         auto it = max_element(std::begin(Q_future), std::end(Q_future));
         int max_q = *it;
-        // Bellman equation.
-        int new_q = reward + discount_factor*max_q;
+        // Bellman equation. 
+        double target = reward + discount_factor*max_q;
+        int new_q = (1-alpha)*Q[state][action] + alpha*target;
         Q[state][action] = new_q;
 
         //DEBUG
