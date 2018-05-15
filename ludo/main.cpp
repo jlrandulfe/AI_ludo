@@ -70,23 +70,39 @@ int main(int argc, char *argv[]){
     QObject::connect(&p4,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
     // Successes counter.
-    int won_games = 0;
-    int total_games = 100;
-    // Main loop.
-    for(int i = 0; i < total_games; ++i){
-        g.start();
-        a.exec();
-        if (g.color == 0) {
-            won_games += 1;
+    int n_tests = 20;
+    int won_games[n_tests] = {};
+    double hit_rate[n_tests];
+    double total_games = 10000;
+    for (int k=0; k<n_tests; ++k) {
+        p1.learning_rate = (n_tests-k) / n_tests;
+        // Learning loop.
+        p1.learning = true;
+        for(int i = 0; i < total_games; ++i){
+            g.start();
+            a.exec();
+            std::cout << i << std::endl;
+            g.reset();
         }
-        std::cout << i << std::endl;
-        g.reset();
+        // Testing loop.
+        p1.learning = false;
+        for(int i = 0; i < total_games; ++i){
+            g.start();
+            a.exec();
+            if (g.color == 0) {
+                won_games[k] += 1;
+            }
+            std::cout << i << std::endl;
+            g.reset();
+        }
+        hit_rate[k] = 100 * won_games[k] / total_games;
     }
 
-    set_Q_matrix(p1.Q, "../resources/q-matrix-temp");
-
-    double hit_rate = 100 * won_games / total_games;
-    std::cout << "P1 won: " << hit_rate << "% out of " << total_games << 
-            " games" << std::endl;
+    // Write the resulting hit rates to a file.
+    std::ofstream results_file("../resources/results");
+    for(int test=0; test<n_tests; ++test){
+        results_file << hit_rate[test] << " ";
+    }
+    set_Q_matrix(p1.Q, "../resources/q-matrix-final");
     return 0;
 }
