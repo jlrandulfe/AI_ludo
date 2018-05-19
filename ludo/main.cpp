@@ -70,12 +70,12 @@ int main(int argc, char *argv[]){
     QObject::connect(&p4,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
     // Successes counter.
-    int n_tests = 20;
+    int n_tests = 10;
     int won_games[n_tests] = {};
     double hit_rate[n_tests];
     double total_games = 5000;
     for (int k=0; k<n_tests; ++k) {
-        p1.learning_rate = (n_tests-k) / n_tests;
+        p1.discount_factor = (n_tests-k) / (0.5*(double)n_tests);
         // Learning loop.
         p1.learning = true;
         for(int i = 0; i < total_games; ++i){
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]){
     }
 
     // Write the resulting hit rates to a file.
-    std::ofstream results_file("../resources/results");
+    std::ofstream results_file("../resources/results_discount-factor");
     for(int test=0; test<n_tests; ++test){
         results_file << hit_rate[test] << " ";
     }

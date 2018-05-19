@@ -8,10 +8,10 @@ ludo_player_custom::ludo_player_custom() {
     // Resize sets the values automatically to 0.
     this->R.resize(this->n_states, std::vector<int>(this->n_actions));
     this->Q.resize(this->n_states, std::vector<int>(this->n_actions));
-    q_learning::construct_R_matrix(this->R);
-    q_learning::get_Q_matrix(this->Q, "../resources/q-matrix");
-    this->discount_factor = 0.5;
-    this->learning_rate = 0.3;
+    q_learning::import_matrix(this->R, "../resources/r-matrix");
+    q_learning::import_matrix(this->Q, "../resources/q-matrix");
+    this->discount_factor = 0.8;
+    this->learning_rate = 0.7;
     this->learning = true;
 }
 
@@ -40,7 +40,7 @@ int ludo_player_custom::make_decision(){
     std::vector<int> movable_pieces;
     if (learning == true) {
         for (int i=0; i<4; ++i) {
-            if (possible_actions[i] != -1) {
+            if (possible_actions[i] != -1 && this->state[i] != 4) {
                 movable_pieces.push_back(i);
             }
         }

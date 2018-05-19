@@ -68,7 +68,7 @@ namespace game_functions {
 
         // Token already at goal.
         else if (init_position == 99) {
-            action = -1;
+            action = 4;
             next_state = 4;
         }
 
