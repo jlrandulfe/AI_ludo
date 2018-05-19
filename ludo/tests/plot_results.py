@@ -42,6 +42,28 @@ def format_plotting():
     return
 
 
+def plot_discount_factor_test():
+    # Get the data from text file
+    with open("../../resources/results_discount-factor", "r") as data_file:
+        data = data_file.readline()
+    num_data = data.split()
+    results = list(map(float, num_data))
+    # Create x-axis, containing the learning rates
+    factor = np.array(list(range(10, 0, -1))) / 5
+    ax = plt.subplot(111)
+    ax.plot(factor, results)
+    ax.set_ylim([0, 100])
+    ax.set_xlabel('Discount factor')
+    ax.set_ylabel('Win rate (%)')
+    format_plotting()
+    plt.title("Discount factor influence for custom R")
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    plt.savefig('{}/tmp/discount_factor.png'.format(script_path),
+                bbox_inches='tight')
+    plt.show()
+    return
+
+
 def plot_learning_rate_test():
     # Get the data from text file
     with open("../../resources/learning-rate_test", "r") as data_file:
@@ -65,4 +87,5 @@ def plot_learning_rate_test():
 
 
 if __name__ == "__main__":
-    plot_learning_rate_test()
+    # plot_learning_rate_test()
+    plot_discount_factor_test()
