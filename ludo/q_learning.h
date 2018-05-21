@@ -7,7 +7,7 @@ namespace q_learning {
     void import_matrix(std::vector< std::vector<int> >& matrix,
                        std::string fname) {
         std::ifstream matrix_file(fname);
-        for(int row=0; row<5; ++row){
+        for(int row=0; row<58; ++row){
             for(int col=0; col<8; ++col){
                 matrix_file >> matrix[row][col];
             }
@@ -26,6 +26,22 @@ namespace q_learning {
             matrix_file << "\n";
         }
         matrix_file.close();
+        return;
+    }
+
+    void create_R_matrix(std::vector< std::vector<int> >& R) {
+        R[0] = {90, 0, 0, 0, 0, 0, 0, 0};
+        for (int i=1; i<44+1; ++i) {
+            R[i] = {0, 10, 20, 30, -100, 50, 0, 0};
+        }
+        R[44+1] = {0, 10, 20, 0, -100, 50, 0, 100};
+        for (int i=45+1; i<51+1; ++i) {
+            R[i] = {0, 10, 20, 0, -100, 50, 200, 300};
+        }
+        for (int i=51+1; i<56+1; ++i) {
+            R[i] = {0, 0, 0, 0, 0, 0, 2, 5};
+        }
+        R[56+1] = {0, 0, 0, 0, 0, 0, 0, 30};
         return;
     }
 

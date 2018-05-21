@@ -6,14 +6,14 @@
 #include <vector>
 #include "ludo_player.h"
 #include "ludo_player_random.h"
-#include "ludo_player_custom.h"
+#include "ludo_player_custom2.h"
 #include "positions_and_dice.h"
 
 Q_DECLARE_METATYPE( positions_and_dice )
 
 void set_Q_matrix(std::vector< std::vector<int> >& Q, std::string fname) {
     std::ofstream matrix_file(fname);
-    for(int row=0; row<5; ++row){
+    for(int row=0; row<58; ++row){
         for(int col=0; col<8; ++col){
             matrix_file << Q[row][col] << " ";
         }
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
     Game g;
 
     //instanciate the players here
-    ludo_player_custom p1;
+    ludo_player_custom2 p1;
     // p1.player_positions = &g.player_positions;
     ludo_player_random p2, p3, p4;
 
@@ -71,38 +71,58 @@ int main(int argc, char *argv[]){
 
     // Successes counter.
     int n_tests = 10;
-    int won_games[n_tests] = {};
-    double hit_rate[n_tests];
-    double total_games = 5000;
-    for (int k=0; k<n_tests; ++k) {
-        p1.discount_factor = (n_tests-k) / (0.5*(double)n_tests);
-        // Learning loop.
-        p1.learning = true;
-        for(int i = 0; i < total_games; ++i){
-            g.start();
-            a.exec();
-            std::cout << i << std::endl;
-            g.reset();
-        }
-        // Testing loop.
-        p1.learning = false;
-        for(int i = 0; i < total_games; ++i){
-            g.start();
-            a.exec();
-            if (g.color == 0) {
-                won_games[k] += 1;
-            }
-            std::cout << i << std::endl;
-            g.reset();
-        }
-        hit_rate[k] = 100 * won_games[k] / total_games;
+    int won_games0 = 0;
+    int won_games1 = 0;
+    int won_games2 = 0;
+    int won_games3 = 0;
+    double hit_rate0;
+    double hit_rate1;
+    double hit_rate2;
+    double hit_rate3;
+    double total_games = 1000;
+    // Learning loop.
+    p1.learning = true;
+    for(int i = 0; i < total_games; ++i){
+        g.start();
+        a.exec();
+        std::cout << i << std::endl;
+        g.reset();
     }
+    // Testing loop.
+    p1.learning = false;
+    for(int i = 0; i < total_games; ++i){
+        g.start();
+        a.exec();
+        if (g.color == 0) {
+            won_games0 += 1;
+        }
+        else if (g.color == 1) {
+            won_games1 += 1;
+        }
+        else if (g.color == 2) {
+            won_games2 += 1;
+        }
+        else if (g.color == 3) {
+            won_games3 += 1;
+        }
+        else {
+            std::cout << "\nUnknown player won\n\n";
+        }
+        std::cout << i << std::endl;
+        g.reset();
+    }
+    hit_rate0 = 100 * won_games0 / total_games;
+    hit_rate1 = 100 * won_games1 / total_games;
+    hit_rate2 = 100 * won_games2 / total_games;
+    hit_rate3 = 100 * won_games3 / total_games;
 
     // Write the resulting hit rates to a file.
-    std::ofstream results_file("../resources/results_discount-factor");
-    for(int test=0; test<n_tests; ++test){
-        results_file << hit_rate[test] << " ";
-    }
-    set_Q_matrix(p1.Q, "../resources/q-matrix-final");
+    // std::ofstream results_file("../resources/results_discount-factor");
+    std::cout << "Won rate p1: " << hit_rate0 << "\n";
+    std::cout << "Won rate p2: " << hit_rate1 << "\n";
+    std::cout << "Won rate p3: " << hit_rate2 << "\n";
+    std::cout << "Won rate p4: " << hit_rate3 << "\n";
+    set_Q_matrix(p1.Q, "../resources/q-matrix4-final");
+    set_Q_matrix(p1.R, "../resources/rewards2");
     return 0;
 }

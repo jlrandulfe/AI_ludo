@@ -8,19 +8,34 @@ namespace game_functions {
         return false;
     }
 
-    bool isStar(int index){
+    int isStar(int index){
         if(index == 5  ||
         index == 18 ||
         index == 31 ||
-        index == 44 ||
-        index == 11 ||
-        index == 24 ||
-        index == 37 ||
-        index == 50) {
-            return true;
+        index == 44){
+            return 6;
+        } else if(index == 11 ||
+                index == 24 ||
+                index == 37 ||
+                index == 50){
+            return 7;
         }
-        return false; 
+        return 0;
     }
+
+    // bool isStar(int index){
+    //     if(index == 5  ||
+    //     index == 18 ||
+    //     index == 31 ||
+    //     index == 44 ||
+    //     index == 11 ||
+    //     index == 24 ||
+    //     index == 37 ||
+    //     index == 50) {
+    //         return true;
+    //     }
+    //     return false; 
+    // }
 
     std::pair<int, int> get_next_state_and_action(int init_position,
                                                   int dice_roll,
@@ -54,6 +69,9 @@ namespace game_functions {
             }
         }
 
+        // Generic state update
+        next_state = next_position + 1;
+
         // Token at start home
         if (init_position == -1) {
             if (dice_roll == 6) {
@@ -68,20 +86,21 @@ namespace game_functions {
 
         // Token already at goal.
         else if (init_position == 99) {
-            action = 4;
-            next_state = 4;
+            action = 7;
+            next_state = 57;
         }
 
         // Token to star
-        else if (isStar(next_position)) {
+        else if (isStar(next_position) != 0) {
             // Last start i.e. directly to goal
             if (next_position == 50) {
                 action = 7;
-                next_state = 4;
+                next_state = 57;
             }
             else{
                 action = 3;
-                next_state = 1;
+                int jump = isStar(next_position);
+                next_state = next_position + jump + 1;
             }
             // TODO: Consider situation when:
             // enemy or blocking at the jumped position
@@ -90,7 +109,9 @@ namespace game_functions {
         // Token to home stretch
         else if (next_position > 50 && next_position !=56) {
             action = 6;
-            next_state = 3;
+            if (next_position > 56) {
+                next_state = 56 - (next_position-56) + 1;
+            }
         }
 
         // Token to globe
@@ -101,20 +122,17 @@ namespace game_functions {
             }
             else {
                 action = 2;
-                next_state = 2;
             }
         }
 
         // Token to goal
         else if (next_position == 56) {
             action = 7;
-            next_state = 4;
         }
 
         // Token to a friend occupied square
         else if (ally == true) {
             action = 2;
-            next_state = 2;
         }
 
         // Token to an enemy occupied square
@@ -125,14 +143,12 @@ namespace game_functions {
             }
             else {
                 action = 5;
-                next_state = 1;
             }
         }
 
         // Token to a normal position
         else {
             action = 1;
-            next_state = 1;
         }
 
         return std::make_pair(next_state, action);
