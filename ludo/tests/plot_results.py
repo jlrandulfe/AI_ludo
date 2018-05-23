@@ -4,6 +4,7 @@ Main project executable.
 """
 # Standard libraries
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 import numpy as np
 import os
 # Third party libraries
@@ -49,13 +50,16 @@ def plot_discount_factor_test():
     num_data = data.split()
     results = list(map(float, num_data))
     # Create x-axis, containing the learning rates
-    factor = np.array(list(range(10, 0, -1))) / 5
+    factor = np.array(list(range(20, 0, -1))) / 10
     ax = plt.subplot(111)
     ax.plot(factor, results)
     ax.set_ylim([0, 100])
     ax.set_xlabel('Discount factor')
     ax.set_ylabel('Win rate (%)')
     format_plotting()
+    # Grid configuration
+    ax.grid()
+    # Set grid to use minor tick locations. 
     plt.title("Discount factor influence for custom R")
     script_path = os.path.dirname(os.path.realpath(__file__))
     plt.savefig('{}/tmp/discount_factor.png'.format(script_path),
@@ -66,7 +70,7 @@ def plot_discount_factor_test():
 
 def plot_learning_rate_test():
     # Get the data from text file
-    with open("../../resources/learning-rate_test", "r") as data_file:
+    with open("../../resources/results_learning-rate", "r") as data_file:
         data = data_file.readline()
     num_data = data.split()
     results = list(map(float, num_data))
@@ -78,6 +82,7 @@ def plot_learning_rate_test():
     ax.set_xlabel('Learning rate')
     ax.set_ylabel('Win rate (%)')
     format_plotting()
+    ax.grid()
     plt.title("Learning rate influence for custom R")
     script_path = os.path.dirname(os.path.realpath(__file__))
     plt.savefig('{}/tmp/learning_rate.png'.format(script_path),
@@ -87,5 +92,5 @@ def plot_learning_rate_test():
 
 
 if __name__ == "__main__":
-    # plot_learning_rate_test()
+    plot_learning_rate_test()
     plot_discount_factor_test()

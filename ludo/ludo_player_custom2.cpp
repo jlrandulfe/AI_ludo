@@ -10,14 +10,17 @@ ludo_player_custom2::ludo_player_custom2() {
     this->Q.resize(this->n_states, std::vector<int>(this->n_actions));
     q_learning::create_R_matrix(this->R);
     // q_learning::import_matrix(this->R, "../resources/r-matrix");
-    // q_learning::import_matrix(this->Q, "../resources/q-matrix2-final");
-    this->discount_factor = 0.5;
-    this->learning_rate = 0.5;
+    // q_learning::import_matrix(this->Q, "../resources/q-matrix15-final2");
+    this->discount_factor = 0.1;
+    this->learning_rate = 0.25;
     this->learning = true;
 }
 
 int ludo_player_custom2::make_decision(){
     bool debug = false;
+    // if (this->learning == false) {
+    //     debug = true;
+    // }
     // If all tokens are blocked, don't run the algorithm
     if (std::all_of(std::begin(this->pos_start_of_turn),
                     std::end(this->pos_start_of_turn),
@@ -41,7 +44,7 @@ int ludo_player_custom2::make_decision(){
     std::vector<int> movable_pieces;
     if (learning == true) {
         for (int i=0; i<4; ++i) {
-            if (possible_actions[i] != -1 && this->state[i] != 4) {
+            if (possible_actions[i] != -1 && this->state[i] != 57) {
                 movable_pieces.push_back(i);
             }
         }
@@ -49,7 +52,7 @@ int ludo_player_custom2::make_decision(){
 
     // DEBUG:
     if (debug) {
-        std::cout << "Dice roll: " << dice_roll << "\n";
+        std::cout << "\nDice roll: " << dice_roll << "\n";
         std::cout << "Tokens positions:\n";
         for (int i=0; i<4; ++i) {
             std::cout << this->pos_start_of_turn[i] << " ";
@@ -88,7 +91,11 @@ int ludo_player_custom2::make_decision(){
                                         this->learning_rate);
         }
         else {
-            select = -1;
+            for(int i = 0; i < 4; ++i){
+                if(this->pos_start_of_turn[i] != 99){
+                    select = i;
+                }
+            }
         }
     }
 
@@ -99,15 +106,24 @@ int ludo_player_custom2::make_decision(){
             if (this->state[i] != 57) {
                 q_values[i] = this->Q[this->state[i]][possible_actions[i]];
             }
+            else {
+                q_values[i] = -10000;
+            }
+        }
+        if (debug) {
+            std::cout << "\nQ-values:\n";
+            for (auto t=0; t<q_values.size(); ++t) {
+                std::cout << q_values[t] << " ";
+            }
         }
         // Look for the maximum q-value
         std::vector<int>::iterator max_it = std::max_element(q_values.begin(),
                                                              q_values.end());
         select = std::distance(q_values.begin(), max_it);
-        // If the q-value is not positive, return a -1.
-        if (q_values[select] <= 0) {
-            select = -1;
-        }
+        // // If the q-value is not positive, return a -1.
+        // if (q_values[select] <= 0) {
+        //     select = -1;
+        // }
     }
 
     //DEBUG
