@@ -23,6 +23,38 @@ void set_Q_matrix(std::vector< std::vector<int> >& Q, std::string fname) {
     return;
 }
 
+int matrix_total(std::vector< std::vector<int> > matrix) {
+    int total_sum = 0;
+    int n_rows = matrix.size();
+    for (int row=0; row<n_rows; ++row) {
+        for (auto& n : matrix[row])
+            total_sum += n;
+    }
+    return total_sum;
+}
+
+int matrix_difference(std::vector< std::vector<int> > matrix1,
+                      std::vector< std::vector<int> > matrix2) {
+    int diff = 0;
+    int n_rows = matrix1.size();
+    int n_cols = matrix1[0].size();
+    for (int row=0; row<n_rows; ++row) {
+        std::vector<int> row_diff;
+        row_diff.resize(n_cols);
+        std::transform (matrix1[row].begin(), matrix1[row].end(),
+                        matrix2[row].begin(), row_diff.begin(),
+                        std::minus<int>());
+        for (auto& n : row_diff)
+            if (n<0) {
+                diff -= n;
+            }
+            else {
+                diff += n;   
+            }
+    }
+    return diff;
+}
+
 int main(int argc, char *argv[]){
     QApplication a(argc, argv);
     qRegisterMetaType<positions_and_dice>();
@@ -69,6 +101,8 @@ int main(int argc, char *argv[]){
     QObject::connect(&g, SIGNAL(player4_end(std::vector<int>)),    &p4,SLOT(post_game_analysis(std::vector<int>)));
     QObject::connect(&p4,SIGNAL(turn_complete(bool)),              &g, SLOT(turnComplete(bool)));
 
+    std::vector< std::vector<int> > prev_Q;
+    prev_Q.resize(p1.Q.size(), std::vector<int>(p1.Q[0].size()));
     // Successes counter.
     int n_tests = 10;
     int won_games0 = 0;
@@ -79,18 +113,21 @@ int main(int argc, char *argv[]){
     double hit_rate1;
     double hit_rate2;
     double hit_rate3;
-    double total_games = 10000;
+    double test_games = 1000;
+    double learning_games = 100000;
+    int diffs[(int)learning_games] = {};
     // Learning loop.
     p1.learning = true;
-    for(int i = 0; i < total_games; ++i){
+    for(int i = 0; i < learning_games; ++i){
         g.start();
         a.exec();
-        std::cout << i << std::endl;
         g.reset();
+        diffs[i] = matrix_total(p1.Q);
+        prev_Q = p1.Q;
     }
     // Testing loop.
     p1.learning = false;
-    for(int i = 0; i < total_games; ++i){
+    for(int i = 0; i < test_games; ++i){
         g.start();
         a.exec();
         if (g.color == 0) {
@@ -108,13 +145,12 @@ int main(int argc, char *argv[]){
         else {
             std::cout << "\nUnknown player won\n\n";
         }
-        std::cout << i << std::endl;
         g.reset();
     }
-    hit_rate0 = 100 * won_games0 / total_games;
-    hit_rate1 = 100 * won_games1 / total_games;
-    hit_rate2 = 100 * won_games2 / total_games;
-    hit_rate3 = 100 * won_games3 / total_games;
+    hit_rate0 = 100 * won_games0 / test_games;
+    hit_rate1 = 100 * won_games1 / test_games;
+    hit_rate2 = 100 * won_games2 / test_games;
+    hit_rate3 = 100 * won_games3 / test_games;
 
     // Write the resulting hit rates to a file.
     std::cout << "Won rate p1: " << hit_rate0 << "\n";
@@ -124,7 +160,11 @@ int main(int argc, char *argv[]){
 
     set_Q_matrix(p1.Q, "../resources/q-matrix-v2-final");
 
-
+    // Write the tendency of the Q matrix change to a file
+    std::ofstream q_evo_file("../resources/results_q-evolution");
+    for(int run=0; run<learning_games; ++run){
+        q_evo_file << diffs[run] << " ";
+    }
 
 
 

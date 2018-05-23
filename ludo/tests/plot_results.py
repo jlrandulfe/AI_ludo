@@ -63,7 +63,7 @@ def plot_discount_factor_test():
     plt.title("Discount factor influence for custom R")
     script_path = os.path.dirname(os.path.realpath(__file__))
     plt.savefig('{}/tmp/discount_factor.png'.format(script_path),
-                bbox_inches='tight')
+                bbox_inches='tight', dpi=1000)
     plt.show()
     return
 
@@ -86,11 +86,34 @@ def plot_learning_rate_test():
     plt.title("Learning rate influence for custom R")
     script_path = os.path.dirname(os.path.realpath(__file__))
     plt.savefig('{}/tmp/learning_rate.png'.format(script_path),
-                bbox_inches='tight')
+                bbox_inches='tight', dpi=1000)
+    plt.show()
+    return
+
+def plot_q_evolution():
+    # Get the data from text file
+    with open("../../resources/results_q-evolution", "r") as data_file:
+        data = data_file.readline()
+    num_data = data.split()
+    results = list(map(float, num_data))
+    # Create x-axis, containing the learning rates
+    iteration = list(range(len(results)))
+    ax = plt.subplot(111)
+    ax.plot(iteration, results)
+    # ax.set_ylim([0, 100])
+    ax.set_xlabel('Iteration')
+    ax.set_ylabel('Matrix sum of elements')
+    format_plotting()
+    ax.grid()
+    plt.title("Evolution of the Q-matrix")
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    plt.savefig('{}/tmp/q_evolution.png'.format(script_path),
+                bbox_inches='tight', dpi=1000)
     plt.show()
     return
 
 
 if __name__ == "__main__":
-    plot_learning_rate_test()
-    plot_discount_factor_test()
+    # plot_learning_rate_test()
+    # plot_discount_factor_test()
+    plot_q_evolution()
